@@ -1,16 +1,5 @@
-# React + Phaser Series - Basic Setup
+# React + Phaser Series 
 
-### Overview:
-
-This repository contains the source code for the "Basic Setup of Phaser in React JS" tutorial as part of the "React + Phaser Series" by Smruti Ranjan. In this tutorial, we explore the proper setup of Phaser in a React JS environment to avoid multiple canvas rendering issues.
-
-### Contents:
-
-- **src/**: The main source code directory
-  - **components/**: React components related to Phaser setup
-  - **phaser-game/**: Phaser game setup and logic
-- **public/**: Public assets and HTML template
-- **package.json**: Node.js dependencies and project configuration
 
 ### Getting Started:
 
