@@ -32,7 +32,6 @@ Follow these steps to get the project up and running on your local machine:
 ### Additional Notes:
 
 - Ensure you have Node.js and npm installed on your machine.
-- This code is a starting point for understanding the basic setup of Phaser in a React application. Feel free to extend and modify it for your specific game development needs.
 
 ### Resources:
 
