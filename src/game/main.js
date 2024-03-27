@@ -1,16 +1,17 @@
 import Phaser from "phaser";
 import { Game } from "./scenes/Game";
 
+// Ottieni le dimensioni della finestra del browser
+const screenWidth = window.innerWidth;
+const screenHeight = window.innerHeight;
+
 export const config = {
   type: Phaser.AUTO,
   parent: 'phaser-container',
-  width: 800,
-  height: 600,
+  width: screenWidth,
+  height: screenHeight,
   scene: Game,
   physics: {
     default: "arcade",
-    arcade: {
-      gravity: { y: 300 },
-    },
   },
 };
