@@ -13,24 +13,27 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
 
         // Inizializza la barra della vita del nemico
         this.healthBar = scene.add.graphics();
+        this.damagePerHit = 5;
+        this.lastDamageTime = 0;
     }
     
     playerHit(player) {
         const currentTime = this.scene.time.now;
-        if (currentTime - player.lastDamageTime < 1000) { // Verifica se è passato 1 secondo
-            return; // Esci se non è passato abbastanza tempo
+        if (currentTime - this.lastDamageTime < 1000) { 
+            return;
         }
+        
         // Applica i danni al giocatore
-        player.health -= 10;
-        player.lastDamageTime = currentTime; // Aggiorna il tempo dell'ultimo danno
+        player.health -= this.damagePerHit;
+        this.lastDamageTime = currentTime; 
 
         if (player.health <= 0) {
-        // Se la vita del giocatore è 0 o meno, avvia la scena di game over
-        this.scene.scene.start('game-over');
+            // Se la vita del giocatore è 0 o meno, avvia la scena di game over
+            this.scene.scene.start('game-over');
         } else {
-        // Aggiorna la barra della vita del giocatore solo se la vita è maggiore di 0
-        player.updateHealthBar();
-    }
+            // Aggiorna la barra della vita del giocatore solo se la vita è maggiore di 0
+            player.updateHealthBar();
+        }
     }
 
     update(player) {
@@ -41,3 +44,4 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.scene.physics.overlap(this, player, this.enemyHit, null, this);
     }
 }
+

@@ -15,8 +15,8 @@ export default class GameOverScene extends Phaser.Scene {
         const restartButton = this.add.text(400, 400, 'Restart', { fontSize: '24px', fill: '#fff' }).setOrigin(0.5);
         restartButton.setInteractive(); // Rendi il pulsante interattivo
         restartButton.on('pointerdown', () => {
-            // Al click del pulsante, riavvia la scena del gioco
-            this.scene.start('main-game');
+            // Al click del pulsante, ricarica la pagina
+            window.location.reload();
         });
     }
 }

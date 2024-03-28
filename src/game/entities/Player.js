@@ -28,6 +28,14 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             repeat: 0
         });
 
+         // Crea l'animazione per lo sparo della pistola
+         scene.anims.create({
+            key: 'shoot',
+            frames: scene.anims.generateFrameNumbers('shoot', { start: 0, end: 11 }),
+            frameRate: 10,
+            repeat: 0
+        });
+
         // Imposta la scena come proprietà del giocatore
         this.scene = scene;
     }
@@ -58,8 +66,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     attack() {
         // Verifica se è passato almeno un secondo dall'ultimo attacco
         const currentTime = this.scene.time.now;
-        if (currentTime - this.lastAttackTime < 1000) { // Imposta 1000 millisecondi (1 secondo)
-            return; // Esci dalla funzione se non è passato abbastanza tempo
+        if (currentTime - this.lastAttackTime < 1000) { 
+            return; 
         }
 
         // Determina la direzione del giocatore
@@ -84,10 +92,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
         // Imposta la rotazione dello sprite dello slash
         slash.setRotation(rotationAngle);
-
-        // Imposta la scala dello sprite dello slash per renderlo più piccolo
-        const scaleValue = 1; // Imposta il valore di scala desiderato
-        slash.setScale(scaleValue); // Modifica il valore della scala in base alle tue esigenze
+        const scaleValue = 0.7;
+        slash.setScale(scaleValue);
 
         // Imposta le dimensioni dell'hitbox in base alla scala dello sprite
         const newWidth = slash.width * scaleValue;
@@ -108,7 +114,61 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.lastAttackTime = currentTime;
     }
 
+    shoot() {
+        // Verifica se l'animazione della pistola è già in corso
+        if (this.isShooting) {
+            return;
+        }
+    
+        // Imposta lo stato di sparatoria su true
+        this.isShooting = true;
+    
+        const shoot = this.scene.physics.add.sprite(0, 0, 'shoot');
+    
+        shoot.setTexture('shoot', 0);
+        shoot.anims.play('shoot');
+        this.scene.children.add(shoot);
+    
+        const updateShootPosition = () => {
+            const offsetX = 20;
+            const offsetY = 0;
+            shoot.x = this.x + offsetX;
+            shoot.y = this.y + offsetY;
+        };
+    
+        // Aggiornamento della posizione della pistola quando il giocatore si muove
+        this.on('move', updateShootPosition);
+        updateShootPosition();
+    
+        // Trova il nemico più vicino al giocatore
+        let nearestEnemy = null;
+        let nearestDistance = Number.MAX_VALUE;
+        this.scene.enemies.children.iterate(enemy => {
+            const distance = Phaser.Math.Distance.Between(this.x, this.y, enemy.x, enemy.y);
+            if (distance < nearestDistance) {
+                nearestDistance = distance;
+                nearestEnemy = enemy;
+            }
+        });
+    
+        // Se c'è un nemico e il proiettile interseca il nemico, distruggi il nemico
+        if (nearestEnemy) {
+            nearestEnemy.destroy();
+            const angle = Phaser.Math.Angle.Between(this.x, this.y, nearestEnemy.x, nearestEnemy.y);
+    
+            shoot.setRotation(angle);
+        }
+    
+        shoot.on('animationcomplete', () => {
+            shoot.destroy();
+            this.off('move', updateShootPosition);
+            // Ripristina lo stato di sparatoria su false
+            this.isShooting = false;
+        });
+    }
+    
 
+      
     updateHealthBar() {
         // Cancella la barra della vita precedente
         this.healthBar.clear();
@@ -117,13 +177,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.healthBar.fillStyle(0xff0000);
 
         // Calcola la lunghezza della barra della vita in base alla percentuale di hp rimanenti
-        const barLength = (this.health / 100) * 100; // La barra sarà lunga 100 pixel, quindi la percentuale di hp rimanenti è uguale alla lunghezza della barra
+        const barLength = (this.health / 100) * 100; 
 
-        // Disegna la barra della vita
         this.healthBar.fillRect(this.x - 50, this.y - 50, barLength, 10);
-    }
-
-
+    }          
 
     update(cursors) {
         // Movimento del giocatore
@@ -146,11 +203,20 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.setVelocityY(0);
         }
 
+        // Attacco con la spada
         if (Phaser.Input.Keyboard.JustDown(cursors.attack)) {
             this.attack();
         }
 
+        // Attacco con la pistola
+        if (Phaser.Input.Keyboard.JustDown(cursors.shoot)) {
+            this.shoot();
+        }
+
+        // Aggiorna la barra della vita
         this.updateHealthBar();
+
+        // Controlla le collisioni con i nemici e gestisce l'attacco
         this.scene.physics.overlap(this, this.scene.enemies, (player, enemy) => enemy.playerHit(player, this.scene), null, this);
     }
-}
+    }
