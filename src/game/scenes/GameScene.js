@@ -10,10 +10,10 @@ export default class GameScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('platform', 'assets/platform.png');
-    this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 48, frameHeight: 24 });
-    this.load.spritesheet('sword_slash', 'assets/Sword.png', { frameWidth: 550, frameHeight: 400 });
-    this.load.spritesheet('shoot', 'assets/Pistol.png', { frameWidth: 64, frameHeight: 32 });
+    this.load.image('platform', 'assets/Environment/platform.png');
+    this.load.spritesheet('dude', 'assets/SpriteImages/dude.png', { frameWidth: 48, frameHeight: 24 });
+    this.load.spritesheet('sword_slash', 'assets/SpriteImages/Sword.png', { frameWidth: 550, frameHeight: 400 });
+    this.load.spritesheet('shoot', 'assets/SpriteImages/Laser.png', { frameWidth: 256, frameHeight: 64});
   }
 
   create() {
@@ -102,7 +102,7 @@ export default class GameScene extends Phaser.Scene {
     if (Phaser.Input.Keyboard.JustDown(this.cursors.attack)) {
         this.player.attack();
     }
-
+    
     // Controllo dell'input per l'attacco con la pistola
     if (Phaser.Input.Keyboard.JustDown(this.cursors.shoot)) {
         this.player.shoot();
