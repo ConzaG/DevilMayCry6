@@ -10,20 +10,36 @@ export default class GameScene extends Phaser.Scene {
   }
 
   preload() {
+    //Environment
     this.load.image('platform', 'assets/Environment/platform.png');
+    this.load.image('background', 'assets/Environment/background.jpg');
+
+    //Sprites
     this.load.spritesheet('dude', 'assets/SpriteImages/dude.png', { frameWidth: 48, frameHeight: 24 });
     this.load.spritesheet('sword_slash', 'assets/SpriteImages/Sword.png', { frameWidth: 550, frameHeight: 400 });
     this.load.spritesheet('shoot', 'assets/SpriteImages/Laser.png', { frameWidth: 256, frameHeight: 64});
+
+    //Sounds
+    this.load.audio('SwordSound', 'assets/Sounds/SwordSound.mp3');
+    this.load.audio('LaserSound', 'assets/Sounds/LaserSound.mp3');
   }
 
   create() {
+      
+    // Imposta lo sfondo della scena
+    this.add.image(0, 0, 'background').setOrigin(0);
+
     // Imposta la dimensione della mappa
     this.mapWidth = 1900;
     this.mapHeight = 1000;
 
-    // Creazione delle piattaforme
-    this.platforms = this.physics.add.staticGroup();
-    this.createInitialPlatforms();
+     // Creazione delle piattaforme
+     this.platforms = this.physics.add.staticGroup();
+     this.createInitialPlatforms();
+     // Rendi invisibili tutte le piattaforme
+     this.platforms.getChildren().forEach(platform => {
+         platform.setVisible(false); 
+     });
 
     // Creazione del giocatore
     this.player = new Player(this, 800, 500);

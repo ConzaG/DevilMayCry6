@@ -70,6 +70,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             return; 
         }
 
+        this.scene.sound.play('SwordSound');
+
         // Determina la direzione del giocatore
         const isFacingLeft = this.body.velocity.x < 0;
         const isFacingRight = this.body.velocity.x > 0;
@@ -119,7 +121,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         if (this.isShooting) {
             return;
         }
-    
+
+
         // Trova il nemico più vicino al giocatore
         let nearestEnemy = null;
         let nearestDistance = Number.MAX_VALUE;
@@ -136,6 +139,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             return;
         }
     
+        this.scene.sound.play('LaserSound');
+
         // Crea il laser tra il giocatore e il nemico più vicino
         const laser = this.scene.add.sprite(this.x, this.y, 'laser');
         laser.anims.play('shoot'); // Imposta l'animazione 'shoot' per il laser
