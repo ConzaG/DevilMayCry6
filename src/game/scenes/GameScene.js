@@ -69,6 +69,10 @@ export default class GameScene extends Phaser.Scene {
     this.cameras.main.setZoom(1.5);
 
     this.physics.add.collider(this.player, this.platforms); 
+
+    // Aggiungi un testo per visualizzare lo stile
+    this.styleText = this.add.text(20, 20, 'Style: E', { font: '24px Arial', fill: '#ffffff' });
+
   }
 
   createInitialPlatforms() {
@@ -123,6 +127,37 @@ export default class GameScene extends Phaser.Scene {
     if (Phaser.Input.Keyboard.JustDown(this.cursors.shoot)) {
         this.player.shoot();
     }
+
+    //STYLE ********************************************
+    // Calcola la posizione minima e massima consentita per il testo dello stile
+    const minTextX = this.cameras.main.scrollX + 20;
+    const minTextY = this.cameras.main.scrollY + 20;
+    const maxTextX = this.cameras.main.scrollX + this.cameras.main.width - 20 - this.styleText.width;
+    const maxTextY = this.cameras.main.scrollY + this.cameras.main.height - 20 - this.styleText.height;
+
+    // Calcola la posizione del testo dello stile in base alla posizione del giocatore rispetto al centro della telecamera
+    let textX = this.cameras.main.scrollX + this.cameras.main.width / 4 - this.styleText.width / 2;
+    let textY = this.cameras.main.scrollY + this.cameras.main.height / 4 - this.styleText.height / 2;
+
+    // Aggiorna la posizione del testo dello stile se si trova al di fuori dei limiti della telecamera
+    if (textX < minTextX) {
+        textX = minTextX;
+    } else if (textX > maxTextX) {
+        textX = maxTextX;
+    }
+
+    if (textY < minTextY) {
+        textY = minTextY;
+    } else if (textY > maxTextY) {
+        textY = maxTextY;
+    }
+
+    // Imposta la posizione del testo dello stile
+    this.styleText.setPosition(textX, textY);
+
+    // Aggiorna il testo dello stile con il grado corrente
+    this.styleText.setText('Style: ' + this.player.style.grade);
+
 }
 
 }

@@ -1,6 +1,8 @@
 // Player.js
 
 import Phaser from 'phaser';
+import Style from './Style';
+
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, texture) {
@@ -35,6 +37,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             frameRate: 10,
             repeat: 0
         });
+
+        // Imposta lo stile del giocatore
+        this.style = new Style();
 
         // Imposta la scena come proprietà del giocatore
         this.scene = scene;
@@ -110,6 +115,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         // Rileva le collisioni tra lo slash e i nemici
         this.scene.physics.overlap(slash, this.scene.enemies, (slash, enemy) => {
             enemy.destroy();
+            this.style.addKill('sword');
         });
 
         // Aggiorna il tempo dell'ultimo attacco
@@ -162,7 +168,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     
         // Distruggi il nemico quando viene colpito dal laser
         nearestEnemy.destroy();
-    
+        this.style.addKill('laser');
+
         // Imposta lo stato di sparatoria su true
         this.isShooting = true;
     
