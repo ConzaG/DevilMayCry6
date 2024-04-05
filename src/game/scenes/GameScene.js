@@ -57,7 +57,7 @@ export default class GameScene extends Phaser.Scene {
     right: Phaser.Input.Keyboard.KeyCodes.RIGHT,
     attack: Phaser.Input.Keyboard.KeyCodes.Z,
     shoot: Phaser.Input.Keyboard.KeyCodes.X 
-  });
+    });
 
 
     // Imposta i limiti della telecamera
@@ -105,6 +105,7 @@ export default class GameScene extends Phaser.Scene {
       loop: true
     });
   }
+
   
   update() {
     // Movimento del giocatore
