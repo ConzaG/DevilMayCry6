@@ -194,7 +194,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         const barLength = (this.health / 100) * 100; 
 
         this.healthBar.fillRect(this.x - 50, this.y - 50, barLength, 10);
-    }          
+    } 
+    
+    getStyleGrade() {
+        return this.style.grade;
+    }
     
     update(cursors) {
         // Movimento del giocatore

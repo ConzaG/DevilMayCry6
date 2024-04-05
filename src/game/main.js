@@ -4,8 +4,8 @@ import Phaser from "phaser";
 import GameScene from "./scenes/GameScene";
 import GameOverScene from "./scenes/GameOverScene";
 
-const screenWidth = window.innerWidth;
-const screenHeight = window.innerHeight;
+const screenWidth = window.innerWidth + 10;
+const screenHeight = window.innerHeight + 10;
 
 export const config = {
   type: Phaser.AUTO,
