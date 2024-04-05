@@ -3,6 +3,8 @@
 import Phaser from 'phaser';
 import Player from '../entities/Player';
 import Enemy from '../entities/Enemy';
+import Demon from '../entities/Demon'; 
+
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -18,6 +20,8 @@ export default class GameScene extends Phaser.Scene {
     this.load.spritesheet('dude', 'assets/SpriteImages/dude.png', { frameWidth: 48, frameHeight: 24 });
     this.load.spritesheet('sword_slash', 'assets/SpriteImages/Sword.png', { frameWidth: 550, frameHeight: 400 });
     this.load.spritesheet('shoot', 'assets/SpriteImages/Laser.png', { frameWidth: 256, frameHeight: 64 });
+    
+    this.load.spritesheet('demon', 'assets/SpriteImages/Demon.png', { frameWidth: 256, frameHeight: 256 });
 
     //Sounds
     this.load.audio('SwordSound', 'assets/Sounds/SwordSound.mp3');
@@ -56,7 +60,8 @@ export default class GameScene extends Phaser.Scene {
       left: Phaser.Input.Keyboard.KeyCodes.LEFT,
       right: Phaser.Input.Keyboard.KeyCodes.RIGHT,
       attack: Phaser.Input.Keyboard.KeyCodes.Z,
-      shoot: Phaser.Input.Keyboard.KeyCodes.X
+      shoot: Phaser.Input.Keyboard.KeyCodes.X,
+      trasform: Phaser.Input.Keyboard.KeyCodes.SPACE 
     });
 
 
@@ -185,6 +190,15 @@ export default class GameScene extends Phaser.Scene {
           this.musicText = null;
         }, 0);
       }
+    }
+
+    if (this.player.style.grade === 'D' && Phaser.Input.Keyboard.JustDown(this.cursors.trasform)) {
+      // Attiva la trasformazione in demone
+      this.player.setAlpha(0); // Nasconde temporaneamente il giocatore durante la trasformazione (opzionale)
+
+      // Crea un nuovo oggetto demon e attiva la modalità demone
+      const demon = new Demon(this, this.player);
+      demon.activateDemonMode();
     }
 
   }
