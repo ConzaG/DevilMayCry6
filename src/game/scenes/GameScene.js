@@ -163,7 +163,7 @@ export default class GameScene extends Phaser.Scene {
     this.styleText.setText('Style: ' + this.player.style.grade);
 
     // Controlla se il grado dello stile del giocatore è "A"
-    if (playerStyleGrade === 'E' || playerStyleGrade === 'B' || playerStyleGrade === 'S') {
+    if (playerStyleGrade === 'A' || playerStyleGrade === 'B' || playerStyleGrade === 'S') {
       // Mostra il testo "MUSIC STARTS PLAYING" solo se non è già stato creato
       if (!this.musicText) {
         this.musicText = this.add.text(textX + 370, textY + 500, 'MUSIC STARTS PLAYING...', { font: 'italic 24px Arial', fill: '#D6D5C9' });
