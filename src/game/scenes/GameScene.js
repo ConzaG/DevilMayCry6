@@ -191,15 +191,5 @@ export default class GameScene extends Phaser.Scene {
         }, 0);
       }
     }
-
-    if (this.player.style.grade === 'D' && Phaser.Input.Keyboard.JustDown(this.cursors.trasform)) {
-      // Attiva la trasformazione in demone
-      this.player.setAlpha(0); // Nasconde temporaneamente il giocatore durante la trasformazione (opzionale)
-
-      // Crea un nuovo oggetto demon e attiva la modalità demone
-      const demon = new Demon(this, this.player);
-      demon.activateDemonMode();
-    }
-
   }
 }
