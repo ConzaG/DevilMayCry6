@@ -1,6 +1,7 @@
 // main.js
 
 import Phaser from "phaser";
+import GameStartScene from "./scenes/GameStartScene";
 import GameScene from "./scenes/GameScene";
 import GameOverScene from "./scenes/GameOverScene";
 
@@ -12,7 +13,7 @@ export const config = {
   parent: 'phaser-container',
   width: screenWidth,
   height: screenHeight,
-  scene: [GameScene, GameOverScene], 
+  scene: [GameStartScene, GameScene, GameOverScene], 
   physics: {
     default: "arcade",
   },
