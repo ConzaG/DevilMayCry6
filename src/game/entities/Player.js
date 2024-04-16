@@ -116,6 +116,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.scene.physics.overlap(slash, this.scene.enemies, (slash, enemy) => {
             enemy.destroy();
             this.style.addKill('sword');
+            
         });
 
         // Aggiorna il tempo dell'ultimo attacco
@@ -237,6 +238,4 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         // Controlla le collisioni con i nemici e gestisce l'attacco
         this.scene.physics.overlap(this, this.scene.enemies, (player, enemy) => enemy.playerHit(player, this.scene), null, this);
     }    
-     
-    
-    }
+}

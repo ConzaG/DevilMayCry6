@@ -4,6 +4,7 @@ import Phaser from 'phaser';
 import Player from '../entities/Player';
 import Enemy1 from '../entities/Enemy1';
 import Enemy2 from '../entities/Enemy2';
+import Style from '../entities/Style';
 
 
 export default class GameScene extends Phaser.Scene {
@@ -130,7 +131,7 @@ export default class GameScene extends Phaser.Scene {
 
     // Creazione del timer
     this.totalTime = 10 * 60;
-    this.remainingTime = this.totalTime;
+    this.remainingTime= this.totalTime;
 
     const timerY = 20; // Distanza dal bordo superiore dello schermo
 
@@ -157,7 +158,7 @@ export default class GameScene extends Phaser.Scene {
 
     // Se il timer è scaduto, passa alla scena "GameWinScene"
     if (this.remainingTime === 0) {
-      this.scene.start('GameWinScene');
+      this.scene.start('GameWinScene', { username: this.username, score: this.player.style.score });
     }
   }
 
@@ -173,7 +174,7 @@ export default class GameScene extends Phaser.Scene {
 
   createEnemies() {
     const spawnEnemies = () => {
-        const minDistanceFromPlayer = 300; // Distanza minima desiderata dal giocatore
+        const minDistanceFromPlayer = 500; // Distanza minima desiderata dal giocatore
         for (let i = 0; i < 10; i++) {
             let randomX, randomY;
             do {

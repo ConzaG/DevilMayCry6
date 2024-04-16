@@ -1,9 +1,9 @@
 // Style.js
 export default class Style {
     constructor() {
-        this.grade = 'E'; // Inizia con il grado E
-        this.killsWithSword = 0; // Contatore per le uccisioni con la spada
-        this.killsWithLaser = 0; // Contatore per le uccisioni con il laser
+        this.grade = 'E';
+        this.killsWithSword = 0;
+        this.killsWithLaser = 0;
         this.score = 0;
     }
 
@@ -28,13 +28,13 @@ export default class Style {
         // Aggiorna il contatore delle uccisioni in base all'arma utilizzata
         if (weapon === 'sword') {
             this.killsWithSword++;
-            this.score += 10;
+            this.score +=10
         } else if (weapon === 'laser') {
             this.killsWithLaser++;
-            this.score += 5;
+            this.score +=5
         }
         // Aggiorna il grado di stile
         this.increaseGrade();
-        console.log(this.score)
     }
+    
 }

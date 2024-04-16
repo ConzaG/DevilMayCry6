@@ -14,7 +14,7 @@ export const config = {
   parent: 'phaser-container',
   width: screenWidth,
   height: screenHeight,
-  scene: [GameWinScene, GameStartScene, GameScene, GameOverScene, ], 
+  scene: [GameStartScene, GameScene, GameOverScene, GameWinScene ], 
   physics: {
     default: "arcade",
   },
