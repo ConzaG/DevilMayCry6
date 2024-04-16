@@ -14,7 +14,7 @@ export default class GameScene extends Phaser.Scene {
   preload() {
     //Environment
     this.load.image('platform', 'assets/Environment/platform.png');
-    this.load.image('background', 'assets/Environment/background.jpg');
+    this.load.image('backgroundgamescene', 'assets/Environment/background.jpg');
 
     //Sprites
     this.load.spritesheet('dude', 'assets/SpriteImages/dude.png', { frameWidth: 48, frameHeight: 24 });
@@ -28,7 +28,6 @@ export default class GameScene extends Phaser.Scene {
     //Sounds
     this.load.audio('SwordSound', 'assets/Sounds/SwordSound.mp3');
     this.load.audio('LaserSound', 'assets/Sounds/LaserSound.mp3');
-    this.load.audio('ExplosionSound', 'assets/Sounds/ExplosionSound.mp3');
     this.load.audio('GameSceneSound', 'assets/Sounds/GameSceneSound.mp3');
 
   }
@@ -39,7 +38,7 @@ export default class GameScene extends Phaser.Scene {
 
   create() {
     // Imposta lo sfondo della scena
-    // this.add.image(0, 0, 'background').setOrigin(0);
+    //this.add.image(0, 0, 'backgroundgamescene').setOrigin(0);
 
     //musica di sottofondo
     const backgroundMusic = this.sound.add('GameSceneSound', { loop: true });
