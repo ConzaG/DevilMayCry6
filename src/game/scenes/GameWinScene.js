@@ -6,7 +6,7 @@ export default class GameWinScene extends Phaser.Scene {
     }
 
     create() {
-       /*  // Effettua la richiesta GET per ottenere la classifica dei giocatori
+        // Effettua la richiesta GET per ottenere la classifica dei giocatori
         fetch('https://localhost:44381/api/player/', {
             method: 'GET',
             headers: {
@@ -52,7 +52,7 @@ export default class GameWinScene extends Phaser.Scene {
             }
         })
         .catch(error => console.error('Error updating player data:', error));
-        */
+        
 
         this.add.text(this.cameras.main.width / 2, 100, 'HAI VINTO', { fontSize: '32px', fill: 'green' }).setOrigin(0.5);
 

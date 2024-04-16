@@ -52,6 +52,7 @@ export default class GameScene extends Phaser.Scene {
       this.events.once('destroy', () => {
           backgroundMusic.stop();
       });
+      
 
     // Imposta la dimensione della mappa
     this.mapWidth = 1900;
