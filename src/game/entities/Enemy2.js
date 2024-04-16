@@ -41,6 +41,7 @@ export default class Enemy2 extends Phaser.Physics.Arcade.Sprite {
             player.updateHealthBar();
             // Avvia l'animazione di esplosione
             this.play('enemy2explosion', true);
+            this.scene.sound.setVolume(0.1);
             this.scene.sound.play('ExplosionSound');
 
             setTimeout(() => {

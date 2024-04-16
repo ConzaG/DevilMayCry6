@@ -15,7 +15,7 @@ export default class GameOverScene extends Phaser.Scene {
     create() {
         const background = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'backgroundGameover');
         background.width = 800;
-        background.setDisplaySize(this.cameras.main.width/1.3, this.cameras.main.height/1.3); // Imposta le dimensioni per coprire l'intero schermo
+        background.setDisplaySize(this.cameras.main.width/1.3, this.cameras.main.height/1.3); 
 
         this.add.text(this.cameras.main.width / 2, 100, 'GAME OVER', { fontSize: '32px', fill: 'red' }).setOrigin(0.5);
 

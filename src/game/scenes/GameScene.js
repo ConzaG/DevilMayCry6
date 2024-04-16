@@ -29,6 +29,7 @@ export default class GameScene extends Phaser.Scene {
     this.load.audio('SwordSound', 'assets/Sounds/SwordSound.mp3');
     this.load.audio('LaserSound', 'assets/Sounds/LaserSound.mp3');
     this.load.audio('ExplosionSound', 'assets/Sounds/ExplosionSound.mp3');
+    this.load.audio('GameSceneSound', 'assets/Sounds/GameSceneSound.mp3');
 
   }
 
@@ -39,6 +40,19 @@ export default class GameScene extends Phaser.Scene {
   create() {
     // Imposta lo sfondo della scena
     // this.add.image(0, 0, 'background').setOrigin(0);
+
+    //musica di sottofondo
+    const backgroundMusic = this.sound.add('GameSceneSound', { loop: true });
+        backgroundMusic.setVolume(0.2);
+        backgroundMusic.play();
+
+        this.events.on('shutdown', () => {
+          backgroundMusic.stop();
+      });
+  
+      this.events.once('destroy', () => {
+          backgroundMusic.stop();
+      });
 
     // Imposta la dimensione della mappa
     this.mapWidth = 1900;

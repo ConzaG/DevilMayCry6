@@ -6,8 +6,8 @@ export default class GameWinScene extends Phaser.Scene {
     }
 
     create() {
-        // Effettua la richiesta GET per ottenere la classifica dei giocatori
-        fetch('https://localhost:44337/api/player/', {
+       /*  // Effettua la richiesta GET per ottenere la classifica dei giocatori
+        fetch('https://localhost:44381/api/player/', {
             method: 'GET',
             headers: {
                 'Authorization': 'Bearer 0CfwyLR1IUJxv1y4KhkCq5uYOmOaigiKdReEjWUfEkiAXo664L9y30oDmomQHaiDYdVFZuCO1LdBSXUQox87bgU7Mty5UlRWoj77ktBbtV6WtUFlAcYGTxqZfml74LUj3Pj1ut72GafzmXG3ub8PffeDEhh0idlVXGpg',
@@ -38,7 +38,7 @@ export default class GameWinScene extends Phaser.Scene {
         };
 
         // Effettua la richiesta PUT per aggiornare i dati del giocatore corrente
-        fetch('https://localhost:44337/api/player/', {
+        fetch('https://localhost:44381/api/player/', {
             method: 'PUT',
             headers: {
                 'Authorization': 'Bearer 0CfwyLR1IUJxv1y4KhkCq5uYOmOaigiKdReEjWUfEkiAXo664L9y30oDmomQHaiDYdVFZuCO1LdBSXUQox87bgU7Mty5UlRWoj77ktBbtV6WtUFlAcYGTxqZfml74LUj3Pj1ut72GafzmXG3ub8PffeDEhh0idlVXGpg',
@@ -52,5 +52,9 @@ export default class GameWinScene extends Phaser.Scene {
             }
         })
         .catch(error => console.error('Error updating player data:', error));
-    }
+        */
+
+        this.add.text(this.cameras.main.width / 2, 100, 'HAI VINTO', { fontSize: '32px', fill: 'green' }).setOrigin(0.5);
+
+    } 
 }
