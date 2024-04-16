@@ -1,20 +1,26 @@
-// Enemy.js
-
 import Phaser from 'phaser';
 
-export default class Enemy extends Phaser.Physics.Arcade.Sprite {
+export default class Enemy2 extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, texture) {
-        super(scene, x, y, texture);
+        super(scene, x, y, texture); // Assicurati di passare correttamente la texture alla superclasse
         scene.add.existing(this);
         scene.physics.add.existing(this);
 
         // Imposta la velocità del nemico
-        this.speed = 100;
+        this.speed = 300;
 
         // Inizializza la barra della vita del nemico
         this.healthBar = scene.add.graphics();
-        this.damagePerHit = 5;
+        this.damagePerHit = 20;
         this.lastDamageTime = 0;
+
+        this.anims.create({
+            key: 'enemy2explosion',
+            frames: this.anims.generateFrameNumbers('enemy2explosion', { start: 0, end: 4 }),
+            frameRate: 10,
+            repeat: 0
+        }); 
+        
     }
     
     playerHit(player) {
@@ -33,6 +39,13 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         } else {
             // Aggiorna la barra della vita del giocatore solo se la vita è maggiore di 0
             player.updateHealthBar();
+            // Avvia l'animazione di esplosione
+            this.play('enemy2explosion', true);
+            this.scene.sound.play('ExplosionSound');
+
+            setTimeout(() => {
+                this.destroy();
+            }, 1000);
         }
     }
 
@@ -44,4 +57,3 @@ export default class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.scene.physics.overlap(this, player, this.enemyHit, null, this);
     }
 }
-

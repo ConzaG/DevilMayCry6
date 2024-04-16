@@ -231,15 +231,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.shoot();
         }
     
-      /*   // Cambio texture a demon alla pressione del tasto spazio
-        if (Phaser.Input.Keyboard.JustDown(cursors.trasform)) {
-            if (this.texture.key === 'dude') {
-                this.setTexture('demon');
-            } else {
-                this.setTexture('dude');
-            }
-        } */
-    
         // Aggiorna la barra della vita
         this.updateHealthBar();
     

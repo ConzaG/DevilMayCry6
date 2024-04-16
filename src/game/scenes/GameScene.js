@@ -2,8 +2,8 @@
 
 import Phaser from 'phaser';
 import Player from '../entities/Player';
-import Enemy from '../entities/Enemy';
-import Demon from '../entities/Demon'; 
+import Enemy1 from '../entities/Enemy1';
+import Enemy2 from '../entities/Enemy2';
 
 
 export default class GameScene extends Phaser.Scene {
@@ -20,16 +20,23 @@ export default class GameScene extends Phaser.Scene {
     this.load.spritesheet('dude', 'assets/SpriteImages/dude.png', { frameWidth: 48, frameHeight: 24 });
     this.load.spritesheet('sword_slash', 'assets/SpriteImages/Sword.png', { frameWidth: 550, frameHeight: 400 });
     this.load.spritesheet('shoot', 'assets/SpriteImages/Laser.png', { frameWidth: 256, frameHeight: 64 });
-    
-    this.load.spritesheet('demon', 'assets/SpriteImages/Demon.png', { frameWidth: 256, frameHeight: 256 });
+
+    this.load.spritesheet('enemy1', 'assets/SpriteImages/Enemy1.png', { frameWidth: 32, frameHeight: 32 });
+    this.load.image('enemy2', 'assets/Others/skull.svg');
+    this.load.spritesheet('enemy2explosion', 'assets/SpriteImages/Enemy2Explosion.png', { frameWidth: 320, frameHeight: 320 });
 
     //Sounds
     this.load.audio('SwordSound', 'assets/Sounds/SwordSound.mp3');
     this.load.audio('LaserSound', 'assets/Sounds/LaserSound.mp3');
+    this.load.audio('ExplosionSound', 'assets/Sounds/ExplosionSound.mp3');
+
+  }
+
+  init(data) {
+    this.username = data.username;
   }
 
   create() {
-
     // Imposta lo sfondo della scena
     // this.add.image(0, 0, 'background').setOrigin(0);
 
@@ -53,6 +60,35 @@ export default class GameScene extends Phaser.Scene {
     this.enemies = this.physics.add.group();
     this.createEnemies();
 
+    
+    this.anims.create({
+      key: 'enemy1-right',
+      frames: this.anims.generateFrameNumbers('enemy1', { start: 0, end: 2 }), // Imposta i frame per l'animazione verso destra
+      frameRate: 10, // Velocità di riproduzione dell'animazione
+      repeat: -1 // Ripeti l'animazione all'infinito
+    });
+
+    this.anims.create({
+      key: 'enemy1-left',
+      frames: this.anims.generateFrameNumbers('enemy1', { start: 3, end: 5 }), // Imposta i frame per l'animazione verso sinistra
+      frameRate: 10,
+      repeat: -1
+    });
+
+    this.anims.create({
+      key: 'enemy1-up',
+      frames: this.anims.generateFrameNumbers('enemy1', { start: 6, end: 8 }), // Imposta i frame per l'animazione verso l'alto
+      frameRate: 10,
+      repeat: -1
+    });
+
+    this.anims.create({
+      key: 'enemy1-down',
+      frames: this.anims.generateFrameNumbers('enemy1', { start: 9, end: 11 }), // Imposta i frame per l'animazione verso il basso
+      frameRate: 10,
+      repeat: -1
+    });
+
     // Creazione dei tasti della tastiera
     this.cursors = this.input.keyboard.addKeys({
       up: Phaser.Input.Keyboard.KeyCodes.UP,
@@ -61,7 +97,7 @@ export default class GameScene extends Phaser.Scene {
       right: Phaser.Input.Keyboard.KeyCodes.RIGHT,
       attack: Phaser.Input.Keyboard.KeyCodes.Z,
       shoot: Phaser.Input.Keyboard.KeyCodes.X,
-      trasform: Phaser.Input.Keyboard.KeyCodes.SPACE 
+      trasform: Phaser.Input.Keyboard.KeyCodes.SPACE
     });
 
 
@@ -78,39 +114,85 @@ export default class GameScene extends Phaser.Scene {
     // Aggiungi un testo per visualizzare lo stile
     this.styleText = this.add.text(20, 20, 'Style: E', { font: '24px Arial', fill: '#ffffff' });
 
+    // Creazione del timer
+    this.totalTime = 10 * 60;
+    this.remainingTime = this.totalTime;
+
+    const timerY = 20; // Distanza dal bordo superiore dello schermo
+
+    this.timerText = this.add.text(this.cameras.main.centerX, timerY, '10:00', { font: '24px Arial', fill: '#ffffff' }).setOrigin(0.5, 0);
+    this.timer = this.time.addEvent({
+      delay: 1000,
+      callback: this.updateTimer,
+      callbackScope: this,
+      loop: true
+    });
+
   }
 
+  updateTimer() {
+    // Riduci il tempo rimanente di un secondo
+    this.remainingTime--;
+
+    // Calcola i minuti e i secondi rimanenti
+    const minutes = Math.floor(this.remainingTime / 60);
+    const seconds = this.remainingTime % 60;
+
+    // Aggiorna il testo del timer
+    this.timerText.setText(`${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`);
+
+    // Se il timer è scaduto, passa alla scena "GameWinScene"
+    if (this.remainingTime === 0) {
+      this.scene.start('GameWinScene');
+    }
+  }
 
   createInitialPlatforms() {
     // Crea piattaforme iniziali
     for (let i = 0; i < 20; i++) {
-      this.platforms.create(400 + i * 400, 900, 'platform').setScale(3).refreshBody();
+      this.platforms.create(400 + i * 400, 1200, 'platform').setScale(3).refreshBody();
+    }
+    for (let i = 0; i < 20; i++) {
+      this.platforms.create(400 + i * 400, 80, 'platform').setScale(3).refreshBody();
     }
   }
 
   createEnemies() {
     const spawnEnemies = () => {
-      const minDistanceFromPlayer = 300; // Distanza minima desiderata dal giocatore
-      for (let i = 0; i < 10; i++) {
-        let randomX, randomY;
-        do {
-          randomX = Phaser.Math.Between(0, this.mapWidth);
-          randomY = Phaser.Math.Between(0, this.mapHeight);
-        } while (Phaser.Math.Distance.Between(randomX, randomY, this.player.x, this.player.y) < minDistanceFromPlayer);
+        const minDistanceFromPlayer = 300; // Distanza minima desiderata dal giocatore
+        for (let i = 0; i < 10; i++) {
+            let randomX, randomY;
+            do {
+                randomX = Phaser.Math.Between(0, this.mapWidth);
+                randomY = Phaser.Math.Between(0, this.mapHeight);
+            } while (Phaser.Math.Distance.Between(randomX, randomY, this.player.x, this.player.y) < minDistanceFromPlayer);
+            
+            // Seleziona casualmente quale tipo di nemico spawnare
+            const enemyType = Phaser.Math.Between(1, 2); // Scegli tra i numeri 1 e 2
+            let enemy;
 
-        const enemy = new Enemy(this, randomX, randomY, 'enemy');
-        this.enemies.add(enemy);
-      }
+            if (enemyType === 1) {
+                // Crea un nemico di tipo Enemy1
+                enemy = new Enemy1(this, randomX, randomY, 'enemy1');
+            } else {
+                // Crea un nemico di tipo Enemy2
+                enemy = new Enemy2(this, randomX, randomY, 'enemy2');
+                enemy.setScale(0.5);
+            }
+            
+            this.enemies.add(enemy);
+        }
     };
 
     // Esegui la funzione di spawn dei nemici ogni 5 secondi
     this.time.addEvent({
-      delay: 5000,
-      callback: spawnEnemies,
-      callbackScope: this,
-      loop: true
+        delay: 5000,
+        callback: spawnEnemies,
+        callbackScope: this,
+        loop: true
     });
-  }
+}
+
 
 
   update() {
@@ -120,7 +202,23 @@ export default class GameScene extends Phaser.Scene {
     // Movimento dei nemici
     this.enemies.children.iterate(enemy => {
       enemy.update(this.player);
-    });
+
+      // Controlla il tipo di nemico
+      if (enemy instanceof Enemy1) {
+          // Se il nemico è di tipo Enemy, gestisci le animazioni
+          if (enemy.body.velocity.x > 0) {
+              enemy.play('enemy1-right', true);
+          } else if (enemy.body.velocity.x < 0) {
+              enemy.play('enemy1-left', true);
+          } else if (enemy.body.velocity.y < 0) {
+              enemy.play('enemy1-up', true);
+          } else if (enemy.body.velocity.y > 0) {
+              enemy.play('enemy1-down', true);
+          } else {
+              enemy.anims.stop();
+          }
+      }
+  });
 
     // Controllo delle collisioni tra giocatore e nemici
     this.physics.overlap(this.player, this.enemies, this.playerHit, null, this);
@@ -163,6 +261,9 @@ export default class GameScene extends Phaser.Scene {
 
     // Imposta la posizione del testo dello stile
     this.styleText.setPosition(textX, textY);
+
+    //Timer
+    this.timerText.setPosition(textX + 510, textY);
 
     // Aggiorna il testo dello stile con il grado corrente
     this.styleText.setText('Style: ' + this.player.style.grade);
