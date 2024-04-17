@@ -24,12 +24,16 @@ export default class GameScene extends Phaser.Scene {
 
     this.load.spritesheet('enemy1', 'assets/SpriteImages/Enemy1.png', { frameWidth: 32, frameHeight: 32 });
     this.load.image('enemy2', 'assets/Others/skull.svg');
-    this.load.spritesheet('enemy2explosion', 'assets/SpriteImages/Enemy2Explosion.png', { frameWidth: 320, frameHeight: 320 });
 
     //Sounds
     this.load.audio('SwordSound', 'assets/Sounds/SwordSound.mp3');
     this.load.audio('LaserSound', 'assets/Sounds/LaserSound.mp3');
+    this.load.audio('SpecialSound', 'assets/Sounds/SpecialSound.mp3');
     this.load.audio('GameSceneSound', 'assets/Sounds/GameSceneSound.mp3');
+
+    //Effects
+    this.load.image('death', 'assets/Others/death.svg');
+    this.load.spritesheet('enemy2explosion', 'assets/SpriteImages/Enemy2Explosion.png', { frameWidth: 320, frameHeight: 320 });
 
   }
 
@@ -46,17 +50,17 @@ export default class GameScene extends Phaser.Scene {
 
     //musica di sottofondo
     const backgroundMusic = this.sound.add('GameSceneSound', { loop: true });
-        backgroundMusic.setVolume(0.2);
-        backgroundMusic.play();
+    backgroundMusic.setVolume(0.2);
+    backgroundMusic.play();
 
-        this.events.on('shutdown', () => {
-          backgroundMusic.stop();
-      });
-  
-      this.events.once('destroy', () => {
-          backgroundMusic.stop();
-      });
-      
+    this.events.on('shutdown', () => {
+      backgroundMusic.stop();
+    });
+
+    this.events.once('destroy', () => {
+      backgroundMusic.stop();
+    });
+
 
     // Imposta la dimensione della mappa
     this.mapWidth = 1900;
@@ -78,7 +82,7 @@ export default class GameScene extends Phaser.Scene {
     this.enemies = this.physics.add.group();
     this.createEnemies();
 
-    
+
     this.anims.create({
       key: 'enemy1-right',
       frames: this.anims.generateFrameNumbers('enemy1', { start: 0, end: 2 }), // Imposta i frame per l'animazione verso destra
@@ -115,8 +119,9 @@ export default class GameScene extends Phaser.Scene {
       right: Phaser.Input.Keyboard.KeyCodes.RIGHT,
       attack: Phaser.Input.Keyboard.KeyCodes.Z,
       shoot: Phaser.Input.Keyboard.KeyCodes.X,
-      trasform: Phaser.Input.Keyboard.KeyCodes.SPACE
+      space: Phaser.Input.Keyboard.KeyCodes.SPACE,
     });
+
 
 
     // Imposta i limiti della telecamera
@@ -133,8 +138,8 @@ export default class GameScene extends Phaser.Scene {
     this.styleText = this.add.text(20, 20, 'Style: E', { font: '24px Arial', fill: '#ffffff' });
 
     // Creazione del timer
-    this.totalTime = 0.1 * 60;
-    this.remainingTime= this.totalTime;
+    this.totalTime = 0.3 * 60;
+    this.remainingTime = this.totalTime;
 
     const timerY = 20; // Distanza dal bordo superiore dello schermo
 
@@ -176,39 +181,39 @@ export default class GameScene extends Phaser.Scene {
 
   createEnemies() {
     const spawnEnemies = () => {
-        const minDistanceFromPlayer = 500; // Distanza minima desiderata dal giocatore
-        for (let i = 0; i < 10; i++) {
-            let randomX, randomY;
-            do {
-                randomX = Phaser.Math.Between(0, this.mapWidth);
-                randomY = Phaser.Math.Between(0, this.mapHeight);
-            } while (Phaser.Math.Distance.Between(randomX, randomY, this.player.x, this.player.y) < minDistanceFromPlayer);
-            
-            // Seleziona casualmente quale tipo di nemico spawnare
-            const enemyType = Phaser.Math.Between(1, 2); // Scegli tra i numeri 1 e 2
-            let enemy;
+      const minDistanceFromPlayer = 500; // Distanza minima desiderata dal giocatore
+      for (let i = 0; i < 10; i++) {
+        let randomX, randomY;
+        do {
+          randomX = Phaser.Math.Between(0, this.mapWidth);
+          randomY = Phaser.Math.Between(0, this.mapHeight);
+        } while (Phaser.Math.Distance.Between(randomX, randomY, this.player.x, this.player.y) < minDistanceFromPlayer);
 
-            if (enemyType === 1) {
-                // Crea un nemico di tipo Enemy1
-                enemy = new Enemy1(this, randomX, randomY, 'enemy1');
-            } else {
-                // Crea un nemico di tipo Enemy2
-                enemy = new Enemy2(this, randomX, randomY, 'enemy2');
-                enemy.setScale(0.5);
-            }
-            
-            this.enemies.add(enemy);
+        // Seleziona casualmente quale tipo di nemico spawnare
+        const enemyType = Phaser.Math.Between(1, 2); // Scegli tra i numeri 1 e 2
+        let enemy;
+
+        if (enemyType === 1) {
+          // Crea un nemico di tipo Enemy1
+          enemy = new Enemy1(this, randomX, randomY, 'enemy1');
+        } else {
+          // Crea un nemico di tipo Enemy2
+          enemy = new Enemy2(this, randomX, randomY, 'enemy2');
+          enemy.setScale(0.5);
         }
+
+        this.enemies.add(enemy);
+      }
     };
 
     // Esegui la funzione di spawn dei nemici ogni 5 secondi
     this.time.addEvent({
-        delay: 5000,
-        callback: spawnEnemies,
-        callbackScope: this,
-        loop: true
+      delay: 5000,
+      callback: spawnEnemies,
+      callbackScope: this,
+      loop: true
     });
-}
+  }
 
 
 
@@ -222,20 +227,20 @@ export default class GameScene extends Phaser.Scene {
 
       // Controlla il tipo di nemico
       if (enemy instanceof Enemy1) {
-          // Se il nemico è di tipo Enemy, gestisci le animazioni
-          if (enemy.body.velocity.x > 0) {
-              enemy.play('enemy1-right', true);
-          } else if (enemy.body.velocity.x < 0) {
-              enemy.play('enemy1-left', true);
-          } else if (enemy.body.velocity.y < 0) {
-              enemy.play('enemy1-up', true);
-          } else if (enemy.body.velocity.y > 0) {
-              enemy.play('enemy1-down', true);
-          } else {
-              enemy.anims.stop();
-          }
+        // Se il nemico è di tipo Enemy, gestisci le animazioni
+        if (enemy.body.velocity.x > 0) {
+          enemy.play('enemy1-right', true);
+        } else if (enemy.body.velocity.x < 0) {
+          enemy.play('enemy1-left', true);
+        } else if (enemy.body.velocity.y < 0) {
+          enemy.play('enemy1-up', true);
+        } else if (enemy.body.velocity.y > 0) {
+          enemy.play('enemy1-down', true);
+        } else {
+          enemy.anims.stop();
+        }
       }
-  });
+    });
 
     // Controllo delle collisioni tra giocatore e nemici
     this.physics.overlap(this.player, this.enemies, this.playerHit, null, this);
@@ -248,7 +253,8 @@ export default class GameScene extends Phaser.Scene {
     // Controllo dell'input per l'attacco con la pistola
     if (Phaser.Input.Keyboard.JustDown(this.cursors.shoot)) {
       this.player.shoot();
-    }
+    }  
+
 
     //STYLE ********************************************
     const playerStyleGrade = this.player.getStyleGrade();
@@ -262,6 +268,31 @@ export default class GameScene extends Phaser.Scene {
     // Calcola la posizione del testo dello stile in base alla posizione del giocatore rispetto al centro della telecamera
     let textX = this.cameras.main.scrollX + this.cameras.main.width / 4 - this.styleText.width / 2;
     let textY = this.cameras.main.scrollY + this.cameras.main.height / 4 - this.styleText.height / 2;
+
+    //ATTACCO SPECIALE
+    if (Phaser.Input.Keyboard.JustDown(this.cursors.space) && playerStyleGrade === 'SS') {
+      // Chiamata alla funzione per eliminare tutti i nemici
+      this.sound.play('SpecialSound');
+      for (let i = 0; i < 20; i++) {
+          this.player.killAllEnemies();
+      }
+   
+      // Codice per far apparire l'immagine "death" con un'animazione
+      const deathImage = this.add.image(textX + 550, textY + 250, 'death');
+      deathImage.setScale(0); // Imposta la scala iniziale a 0 (piccolo)
+  
+      // Crea un tween per animare l'ingrandimento
+      this.tweens.add({
+          targets: deathImage,
+          scaleX: 2, 
+          scaleY: 1.5, 
+          duration: 1000,
+          ease: 'Back', 
+          onComplete: () => {
+              deathImage.destroy(); 
+          }
+      });
+  }
 
     // Aggiorna la posizione del testo dello stile se si trova al di fuori dei limiti della telecamera
     if (textX < minTextX) {

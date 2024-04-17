@@ -27,14 +27,14 @@ export default class GameStartScene extends Phaser.Scene {
             .setOrigin(0.5)
             .setDisplaySize(bgWidth - 150, bgHeight - 150);
 
-        this.add.text(bgWidth / 2 - 200, 400, 'Choose your username and press "Enter" :', { font: '24px Arial', fill: 'red' });
+        this.add.text(bgWidth / 2 - 200, 700, 'Choose your Username and press "Enter" :', { font: '24px Arial', fill: 'red' });
 
         const input = document.createElement('input');
         input.type = 'text';
         input.style = `
         position: absolute;
         left: 850px;
-        top: 450px;
+        top: 750px;
         width: 200px;
         height: 40px;
         font-size: 24px;

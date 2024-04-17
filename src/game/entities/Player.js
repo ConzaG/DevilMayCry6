@@ -68,6 +68,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         });
     }
 
+    //ATTACCO CON LA SPADA
     attack() {
         // Verifica se è passato almeno un secondo dall'ultimo attacco
         const currentTime = this.scene.time.now;
@@ -123,6 +124,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.lastAttackTime = currentTime;
     }
 
+    //ATTACCO CON LASER
     shoot() {
         // Verifica se l'animazione del laser è già in corso
         if (this.isShooting) {
@@ -182,7 +184,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         });
     }    
 
-     
+    //ATTACCO SPECIALE
+    killAllEnemies() {
+        this.scene.enemies.getChildren().forEach(enemy => enemy.destroy());
+    }
+
+    
       
     updateHealthBar() {
         // Cancella la barra della vita precedente
@@ -220,16 +227,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.setVelocityY(160);
         } else {
             this.setVelocityY(0);
-        }
-    
-        // Attacco con la spada
-        if (Phaser.Input.Keyboard.JustDown(cursors.attack)) {
-            this.attack();
-        }
-    
-        // Attacco con la pistola
-        if (Phaser.Input.Keyboard.JustDown(cursors.shoot)) {
-            this.shoot();
         }
     
         // Aggiorna la barra della vita
