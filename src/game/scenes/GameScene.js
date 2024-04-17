@@ -292,6 +292,8 @@ export default class GameScene extends Phaser.Scene {
               deathImage.destroy(); 
           }
       });
+
+    this.player.style.grade = "D";
   }
 
     // Aggiorna la posizione del testo dello stile se si trova al di fuori dei limiti della telecamera
