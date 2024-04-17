@@ -29,40 +29,44 @@ export default class GameWinScene extends Phaser.Scene {
         const tableHeight = 700;
         const tableX = center - tableWidth / 2;
         const tableY = 200;
-
+    
         const table = this.add.graphics();
         table.fillStyle(0xffffff, 1);
         table.fillRect(tableX, tableY, tableWidth, tableHeight);
-
+    
         // Header della tabella
         const headerStyle = { fontSize: '18px', fill: '#000000' };
         const headerY = tableY + 20;
         this.add.text(center - 150, headerY, 'Username', headerStyle);
         this.add.text(center + 50 , headerY, 'Score', headerStyle);
-
+    
         // Linea sotto l'header
         table.lineStyle(1, 0x000000); // Linea nera
         table.beginPath();
         table.moveTo(tableX, headerY + 30);
         table.lineTo(tableX + tableWidth, headerY + 30);
         table.stroke();
-
-        // Prendi i dati dei giocatori e inseriscili nella tabella
-        this.fetchTopPlayers()
+    
+        // Effettua la richiesta POST per aggiornare i dati del giocatore
+        this.updatePlayerData()
+            .then(() => {
+                // Dopo aver effettuato la richiesta POST, recupera i dati dei giocatori e riempi la tabella
+                return this.fetchTopPlayers();
+            })
             .then(topPlayers => {
                 // Ordina i giocatori per punteggio decrescente
                 topPlayers.sort((a, b) => b.ScorePoints - a.ScorePoints);
-
+    
                 let y = tableY + 70;
                 topPlayers.slice(0, 20).forEach((player, index) => {
                     this.add.text(center - 150, y, player.Username, { fontSize: '16px', fill: '#000000' });
                     this.add.text(center + 50, y, player.ScorePoints.toString(), { fontSize: '16px', fill: '#000000' });
                     y += 30;
                 });
-                this.updatePlayerData()
             })
             .catch(error => console.error('Error fetching top players:', error));
     }
+    
 
     fetchTopPlayers() {
         return fetch('https://localhost:44381/api/player/', {
@@ -85,9 +89,9 @@ export default class GameWinScene extends Phaser.Scene {
             Username: this.username,
             ScorePoints: this.score
         };
-
-        // Effettua la richiesta POST solo una volta dopo aver ottenuto i dati dei giocatori
-        fetch('https://localhost:44381/api/player/', {
+    
+        // Restituisci una promessa che si risolve quando la richiesta POST è completata con successo
+        return fetch('https://localhost:44381/api/player/', {
             method: 'POST',
             headers: {
                 'Authorization': 'Bearer 0CfwyLR1IUJxv1y4KhkCq5uYOmOaigiKdReEjWUfEkiAXo664L9y30oDmomQHaiDYdVFZuCO1LdBSXUQox87bgU7Mty5UlRWoj77ktBbtV6WtUFlAcYGTxqZfml74LUj3Pj1ut72GafzmXG3ub8PffeDEhh0idlVXGpg',
@@ -99,7 +103,7 @@ export default class GameWinScene extends Phaser.Scene {
             if (!response.ok) {
                 throw new Error('Failed to update player data');
             }
-        })
-        .catch(error => console.error('Error updating player data:', error));
+        });
     }
+    
 }
