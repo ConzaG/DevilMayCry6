@@ -78,5 +78,17 @@ export default class GameStartScene extends Phaser.Scene {
                 repeat: -1 // Ripete infinite volte
             });
         }
+
+        const button = this.add.text(300, 800, 'LEADERBOARD', { font: '32px Arial', fill: 'green' })
+            .setOrigin(0.5)
+            .setInteractive();
+
+        // Gestisci l'evento di clic sul bottone
+        button.on('pointerdown', () => {
+            // Fai qualcosa quando il bottone viene premuto
+            backgroundMusic.stop();
+            this.scene.start('GameWinScene'); // Qui puoi passare il nome utente desiderato
+            input.style = "display: none";
+        });
     }
 }

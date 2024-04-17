@@ -13,13 +13,26 @@ export default class GameWinScene extends Phaser.Scene {
 
     create() {
         this.createTable();
-        this.add.text(this.cameras.main.width / 2, 150, `${this.username}: ${this.score} points`, { fontSize: '24px', fill: 'white' }).setOrigin(0.5);
+        const text1 = this.add.text(this.cameras.main.width / 2, 100, 'YOU WON', { fontSize: '32px', fill: 'green' }).setOrigin(0.5);
+
+        const text2 = this.add.text(this.cameras.main.width / 2, 150, `${this.username}: ${this.score} points`, { fontSize: '24px', fill: 'white' }).setOrigin(0.5);
+        if (this.username === undefined && this.score === undefined) {
+            text1.visible = false;
+            text2.visible = false;
+        }
+
+        //pulsante per ricominciare il gioco
+        const restartButton = this.add.text(1400, 500, 'Turn Home', { fontSize: '24px', fill: '#fff' }).setOrigin(0.5);
+        restartButton.setInteractive(); 
+        restartButton.on('pointerdown', () => {
+            // Al click del pulsante, ricarica la pagina
+            window.location.reload();
+        });
     }
 
    
     update() {
         // In questa funzione si può mettere solo la logica per l'interfaccia grafica, evitando chiamate API
-        this.add.text(this.cameras.main.width / 2, 100, 'YOU WON', { fontSize: '32px', fill: 'green' }).setOrigin(0.5);
     } 
 
     createTable() {
