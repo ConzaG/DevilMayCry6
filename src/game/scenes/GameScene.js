@@ -39,7 +39,10 @@ export default class GameScene extends Phaser.Scene {
 
   create() {
     // Imposta lo sfondo della scena
-    //this.add.image(0, 0, 'backgroundgamescene').setOrigin(0);
+    const backgroundImage = this.add.image(0, 0, 'backgroundgamescene').setOrigin(0);
+    backgroundImage.displayWidth = window.innerWidth + 20;
+    backgroundImage.displayHeight = window.innerHeight + 70;
+
 
     //musica di sottofondo
     const backgroundMusic = this.sound.add('GameSceneSound', { loop: true });
@@ -68,7 +71,7 @@ export default class GameScene extends Phaser.Scene {
     });
 
     // Creazione del giocatore
-    this.player = new Player(this, 800, 500);
+    this.player = new Player(this, 800, 900);
     this.player.setScale(2);
 
     // Creazione degli nemici
