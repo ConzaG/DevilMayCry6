@@ -10,6 +10,8 @@ import Style from '../entities/Style';
 export default class GameScene extends Phaser.Scene {
   constructor() {
     super({ key: 'GameScene' });
+    this.backgroundMusic = null;
+    this.styleMusic = null;
   }
 
   preload() {
@@ -29,6 +31,7 @@ export default class GameScene extends Phaser.Scene {
     this.load.audio('SwordSound', 'assets/Sounds/SwordSound.mp3');
     this.load.audio('LaserSound', 'assets/Sounds/LaserSound.mp3');
     this.load.audio('SpecialSound', 'assets/Sounds/SpecialSound.mp3');
+    this.load.audio('StyleSound', 'assets/Sounds/StyleSound.mp3');
     this.load.audio('GameSceneSound', 'assets/Sounds/GameSceneSound.mp3');
 
     //Effects
@@ -49,18 +52,28 @@ export default class GameScene extends Phaser.Scene {
 
 
     //musica di sottofondo
-    const backgroundMusic = this.sound.add('GameSceneSound', { loop: true });
-    backgroundMusic.setVolume(0.2);
-    backgroundMusic.play();
+    this.backgroundMusic = this.sound.add('GameSceneSound', { loop: true });
+    this.backgroundMusic.setVolume(0.2);
+    this.backgroundMusic.play();
 
     this.events.on('shutdown', () => {
-      backgroundMusic.stop();
+      this.backgroundMusic.stop();
     });
 
     this.events.once('destroy', () => {
-      backgroundMusic.stop();
+      this.backgroundMusic.stop();
     });
 
+    //musica per stile alto
+    this.StyleMusic = this.sound.add('StyleSound', { loop: true });
+
+    this.events.on('shutdown', () => {
+      this.StyleMusic.stop();
+    });
+
+    this.events.once('destroy', () => {
+      this.StyleMusic.stop();
+    });
 
     // Imposta la dimensione della mappa
     this.mapWidth = 1900;
@@ -138,7 +151,7 @@ export default class GameScene extends Phaser.Scene {
     this.styleText = this.add.text(20, 20, 'Style: E', { font: '24px Arial', fill: '#ffffff' });
 
     // Creazione del timer
-    this.totalTime = 0.3 * 60;
+    this.totalTime = 10 * 60;
     this.remainingTime = this.totalTime;
 
     const timerY = 20; // Distanza dal bordo superiore dello schermo
@@ -216,7 +229,6 @@ export default class GameScene extends Phaser.Scene {
   }
 
 
-
   update() {
     // Movimento del giocatore
     this.player.update(this.cursors);
@@ -253,7 +265,7 @@ export default class GameScene extends Phaser.Scene {
     // Controllo dell'input per l'attacco con la pistola
     if (Phaser.Input.Keyboard.JustDown(this.cursors.shoot)) {
       this.player.shoot();
-    }  
+    }
 
 
     //STYLE ********************************************
@@ -268,33 +280,6 @@ export default class GameScene extends Phaser.Scene {
     // Calcola la posizione del testo dello stile in base alla posizione del giocatore rispetto al centro della telecamera
     let textX = this.cameras.main.scrollX + this.cameras.main.width / 4 - this.styleText.width / 2;
     let textY = this.cameras.main.scrollY + this.cameras.main.height / 4 - this.styleText.height / 2;
-
-    //ATTACCO SPECIALE
-    if (Phaser.Input.Keyboard.JustDown(this.cursors.space) && playerStyleGrade === 'SS') {
-      // Chiamata alla funzione per eliminare tutti i nemici
-      this.sound.play('SpecialSound');
-      for (let i = 0; i < 20; i++) {
-          this.player.killAllEnemies();
-      }
-   
-      // Codice per far apparire l'immagine "death" con un'animazione
-      const deathImage = this.add.image(textX + 550, textY + 250, 'death');
-      deathImage.setScale(0); // Imposta la scala iniziale a 0 (piccolo)
-  
-      // Crea un tween per animare l'ingrandimento
-      this.tweens.add({
-          targets: deathImage,
-          scaleX: 2, 
-          scaleY: 1.5, 
-          duration: 1000,
-          ease: 'Back', 
-          onComplete: () => {
-              deathImage.destroy(); 
-          }
-      });
-
-    this.player.style.grade = "D";
-  }
 
     // Aggiorna la posizione del testo dello stile se si trova al di fuori dei limiti della telecamera
     if (textX < minTextX) {
@@ -342,5 +327,57 @@ export default class GameScene extends Phaser.Scene {
         }, 0);
       }
     }
+
+    if ((playerStyleGrade === 'B' || playerStyleGrade === 'A' || playerStyleGrade === 'S' || playerStyleGrade === 'SS') && !this.StyleMusic.isPlaying) {
+
+      this.StyleMusic.play();
+      this.StyleMusic.setVolume(0.5);
+      this.backgroundMusic.stop();
+    }
+
+
+    if (Phaser.Input.Keyboard.JustDown(this.cursors.space) && playerStyleGrade === 'SS') {
+
+      // Chiamata alla funzione per eliminare tutti i nemici
+      this.sound.play('SpecialSound');
+      for (let i = 0; i < 20; i++) {
+        this.player.killAllEnemies();
+      }
+
+      // Aggiungi un rettangolo a pieno schermo con colore nero e opacità
+      const blackoutRect = this.add.rectangle(0, 0, this.cameras.main.width + 100, this.cameras.main.height + 100, 0x000000);
+      blackoutRect.setOrigin(0);
+      blackoutRect.setAlpha(1); 
+
+      // Codice per far apparire l'immagine "death" con un'animazione
+      const deathImage = this.add.image(textX + 550, textY + 250, 'death');
+      deathImage.setScale(0); 
+
+      // Crea un tween per animare l'ingrandimento
+      this.tweens.add({
+        targets: deathImage,
+        scaleX: 2,
+        scaleY: 1.5,
+        duration: 1000,
+        ease: 'Back',
+        onComplete: () => {
+          // Abilita gli input dopo l'animazione
+          this.input.enabled = true;
+          deathImage.destroy();
+          blackoutRect.destroy(); // Rimuovi il rettangolo nero dopo l'animazione
+        }
+      });
+
+      // Ferma la musica dello stile e avvia la musica di background
+      this.StyleMusic.stop();
+      this.backgroundMusic.play();
+
+      // Imposta il grado dello stile del giocatore a "D" e reinizializza il conteggio delle uccisioni
+      this.player.style.grade = "D";
+      this.player.style.killsWithLaser = 0;
+      this.player.style.killsWithSword = 0;
+    }
+
+
   }
 }
