@@ -39,6 +39,6 @@ Follow these steps to get the project up and running on your local machine:
 - Phaser Documentation: https://phaser.io/learn
 - React + Phaser Series Playlist: https://www.youtube.com/playlist?list=PLyW52oUipUpyXYvGtLe4wXm9IMA2nSEDP
 
-- ### Backend Repo:
+## Backend Repo:
 https://github.com/ConzaG/SoupAndDungeonBackend
 
