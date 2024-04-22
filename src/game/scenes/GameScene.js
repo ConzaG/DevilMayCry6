@@ -5,6 +5,8 @@ import Player from '../entities/Player';
 import Enemy1 from '../entities/Enemy1';
 import Enemy2 from '../entities/Enemy2';
 import Style from '../entities/Style';
+import Chest from '../Items/Chest';
+import items from '../Items/Items';
 
 
 export default class GameScene extends Phaser.Scene {
@@ -12,12 +14,14 @@ export default class GameScene extends Phaser.Scene {
     super({ key: 'GameScene' });
     this.backgroundMusic = null;
     this.styleMusic = null;
+
   }
 
   preload() {
     //Environment
     this.load.image('platform', 'assets/Environment/platform.png');
     this.load.image('backgroundgamescene', 'assets/Environment/background.jpg');
+
 
     //Sprites
     this.load.spritesheet('dude', 'assets/SpriteImages/dude.png', { frameWidth: 48, frameHeight: 24 });
@@ -26,6 +30,8 @@ export default class GameScene extends Phaser.Scene {
 
     this.load.spritesheet('enemy1', 'assets/SpriteImages/Enemy1.png', { frameWidth: 32, frameHeight: 32 });
     this.load.image('enemy2', 'assets/Others/skull.svg');
+    this.load.image('chest', 'assets/Others/chest.png');
+
 
     //Sounds
     this.load.audio('SwordSound', 'assets/Sounds/SwordSound.mp3');
@@ -163,6 +169,11 @@ export default class GameScene extends Phaser.Scene {
       callbackScope: this,
       loop: true
     });
+
+
+    //CHESTS
+    this.chest = new Chest(this, 1400, 900, items, this);
+
   }
 
   updateTimer() {
@@ -193,8 +204,10 @@ export default class GameScene extends Phaser.Scene {
   }
 
   createEnemies() {
+    let enemySpawnRate = 5000; // Millisecondi tra ogni spawn di nemici
+    const minDistanceFromPlayer = 500; // Distanza minima desiderata dal giocatore
+
     const spawnEnemies = () => {
-      const minDistanceFromPlayer = 500; // Distanza minima desiderata dal giocatore
       for (let i = 0; i < 10; i++) {
         let randomX, randomY;
         do {
@@ -203,14 +216,14 @@ export default class GameScene extends Phaser.Scene {
         } while (Phaser.Math.Distance.Between(randomX, randomY, this.player.x, this.player.y) < minDistanceFromPlayer);
 
         // Seleziona casualmente quale tipo di nemico spawnare
-        const enemyType = Phaser.Math.Between(1, 2); // Scegli tra i numeri 1 e 2
+        const enemyType = Phaser.Math.Between(1, 10); // Utilizza un range più ampio per generare più Enemy1
         let enemy;
 
-        if (enemyType === 1) {
-          // Crea un nemico di tipo Enemy1
+        if (enemyType <= 8) {
+          // Crea un nemico di tipo Enemy1 con una probabilità del 80%
           enemy = new Enemy1(this, randomX, randomY, 'enemy1');
         } else {
-          // Crea un nemico di tipo Enemy2
+          // Crea un nemico di tipo Enemy2 con una probabilità del 20%
           enemy = new Enemy2(this, randomX, randomY, 'enemy2');
           enemy.setScale(0.5);
         }
@@ -219,13 +232,37 @@ export default class GameScene extends Phaser.Scene {
       }
     };
 
-    // Esegui la funzione di spawn dei nemici ogni 5 secondi
-    this.time.addEvent({
-      delay: 5000,
+    // Esegui la funzione di spawn dei nemici ogni enemySpawnRate millisecondi
+    const spawnEvent = this.time.addEvent({
+      delay: enemySpawnRate,
       callback: spawnEnemies,
       callbackScope: this,
       loop: true
     });
+
+    // Ogni 30 secondi, riduci il tempo tra gli spawn dei nemici
+    this.time.addEvent({
+      delay: 30000,
+      callback: () => {
+        enemySpawnRate -= 500; // Riduci il tempo tra gli spawn dei nemici di 500 millisecondi
+        spawnEvent.delay = enemySpawnRate; // Aggiorna il delay dell'evento di spawn
+      },
+      callbackScope: this,
+      loop: true
+    });
+  }
+
+
+
+  pauseGame() {
+    // Metti in pausa il timer
+    this.timer.paused = true;
+
+  }
+
+  resumeGame() {
+    // Riprendi il timer
+    this.timer.paused = false;
   }
 
 
@@ -301,7 +338,7 @@ export default class GameScene extends Phaser.Scene {
     this.timerText.setPosition(textX + 510, textY);
 
     // Aggiorna il testo dello stile con il grado corrente
-    this.styleText.setText('Style: ' + this.player.style.grade);
+    this.styleText.setText('' + this.player.style.grade);
 
     // Controlla se il grado dello stile del giocatore è "A"
     if (playerStyleGrade === 'A' || playerStyleGrade === 'B' || playerStyleGrade === 'S') {
@@ -347,11 +384,11 @@ export default class GameScene extends Phaser.Scene {
       // Aggiungi un rettangolo a pieno schermo con colore nero e opacità
       const blackoutRect = this.add.rectangle(0, 0, this.cameras.main.width + 100, this.cameras.main.height + 100, 0x000000);
       blackoutRect.setOrigin(0);
-      blackoutRect.setAlpha(1); 
+      blackoutRect.setAlpha(1);
 
       // Codice per far apparire l'immagine "death" con un'animazione
       const deathImage = this.add.image(textX + 550, textY + 250, 'death');
-      deathImage.setScale(0); 
+      deathImage.setScale(0);
 
       // Crea un tween per animare l'ingrandimento
       this.tweens.add({
@@ -379,5 +416,24 @@ export default class GameScene extends Phaser.Scene {
     }
 
 
+    //CHESTS **********************************
+    const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, 1400, 900);
+
+    const activationDistance = 50;
+    // Controlla se il giocatore è abbastanza vicino alla cassa
+    if (distance < activationDistance) {
+      // Se il giocatore è abbastanza vicino alla cassa, mostra il modale e metti in pausa il gioco
+      this.chest.isOpen = true;
+      this.chest.showModal();
+      this.pauseGame();
+    } else {
+      // Controlla se il modale è aperto
+      if (distance > activationDistance) {
+        // Chiudi il modale solo se è aperto
+        this.chest.isOpen = false;
+        this.chest.showModal();
+        this.resumeGame();
+      }
+    }
   }
 }

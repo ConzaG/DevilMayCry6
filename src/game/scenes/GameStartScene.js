@@ -31,6 +31,7 @@ export default class GameStartScene extends Phaser.Scene {
 
         const input = document.createElement('input');
         input.type = 'text';
+        input.maxLength = 12; 
         input.style = `
         position: absolute;
         left: 850px;

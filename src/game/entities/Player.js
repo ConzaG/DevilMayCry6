@@ -18,6 +18,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.health = 100;
         this.lastDamageTime = 0;
         this.healthBar = scene.add.graphics();
+        
 
         // Crea le animazioni del giocatore
         this.createPlayerAnimations(scene.anims);
