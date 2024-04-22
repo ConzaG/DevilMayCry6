@@ -88,7 +88,19 @@ export default class GameStartScene extends Phaser.Scene {
         button.on('pointerdown', () => {
             // Fai qualcosa quando il bottone viene premuto
             backgroundMusic.stop();
-            this.scene.start('GameWinScene'); // Qui puoi passare il nome utente desiderato
+            this.scene.start('GameWinScene'); 
+            input.style = "display: none";
+        });
+
+        const button2 = this.add.text(1500, 800, 'COMMANDS', { font: '32px Arial', fill: 'green' })
+            .setOrigin(0.5)
+            .setInteractive();
+
+        // Gestisci l'evento di clic sul bottone
+        button2.on('pointerdown', () => {
+            // Fai qualcosa quando il bottone viene premuto
+            backgroundMusic.stop();
+            this.scene.start('CommandsScene'); 
             input.style = "display: none";
         });
     }

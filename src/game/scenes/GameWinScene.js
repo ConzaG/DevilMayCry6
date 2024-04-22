@@ -26,7 +26,7 @@ export default class GameWinScene extends Phaser.Scene {
         restartButton.setInteractive(); 
         restartButton.on('pointerdown', () => {
             // Al click del pulsante, ricarica la pagina
-            window.location.reload();
+            this.scene.start('GameStartScene'); 
         });
     }
 

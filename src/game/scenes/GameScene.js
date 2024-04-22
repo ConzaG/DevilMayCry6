@@ -157,7 +157,7 @@ export default class GameScene extends Phaser.Scene {
     this.styleText = this.add.text(20, 20, 'Style: E', { font: '24px Arial', fill: '#ffffff' });
 
     // Creazione del timer
-    this.totalTime = 10 * 60;
+    this.totalTime = 0.2 * 60;
     this.remainingTime = this.totalTime;
 
     const timerY = 20; // Distanza dal bordo superiore dello schermo
