@@ -172,7 +172,7 @@ export default class GameScene extends Phaser.Scene {
 
 
     //CHESTS
-    this.chest = new Chest(this, 1400, 900, items, this);
+    this.chest = new Chest(this, window.innerWidth/2, window.innerHeight/2, items, this);
 
   }
 
@@ -417,7 +417,7 @@ export default class GameScene extends Phaser.Scene {
 
 
     //CHESTS **********************************
-    const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, 1400, 900);
+    const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, window.innerWidth/2, window.innerHeight/2);
 
     const activationDistance = 50;
     // Controlla se il giocatore è abbastanza vicino alla cassa

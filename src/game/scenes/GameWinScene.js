@@ -32,7 +32,7 @@ export default class GameWinScene extends Phaser.Scene {
 
    
     update() {
-        // In questa funzione si può mettere solo la logica per l'interfaccia grafica, evitando chiamate API
+
     } 
 
     createTable() {
@@ -61,11 +61,13 @@ export default class GameWinScene extends Phaser.Scene {
         table.stroke();
     
         // Effettua la richiesta POST per aggiornare i dati del giocatore
-        this.updatePlayerData()
-            .then(() => {
-                // Dopo aver effettuato la richiesta POST, recupera i dati dei giocatori e riempi la tabella
-                return this.fetchTopPlayers();
-            })
+        if (this.username !== undefined && this.score !== undefined) {
+            this.updatePlayerData()
+                .catch(error => console.error('Error updating player data:', error));
+        }
+    
+        // Effettua la richiesta GET per ottenere i dati dei migliori giocatori e riempire la tabella
+        this.fetchTopPlayers()
             .then(topPlayers => {
                 // Ordina i giocatori per punteggio decrescente
                 topPlayers.sort((a, b) => b.ScorePoints - a.ScorePoints);
@@ -80,7 +82,6 @@ export default class GameWinScene extends Phaser.Scene {
             .catch(error => console.error('Error fetching top players:', error));
     }
     
-
     fetchTopPlayers() {
         return fetch('https://localhost:44381/api/player/', {
             method: 'GET',
@@ -118,5 +119,4 @@ export default class GameWinScene extends Phaser.Scene {
             }
         });
     }
-    
-}
+}    
