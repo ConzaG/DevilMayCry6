@@ -1,6 +1,8 @@
 // Player.js
 
 import Phaser from 'phaser';
+import Style from './Style';
+
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, texture) {
@@ -16,6 +18,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.health = 100;
         this.lastDamageTime = 0;
         this.healthBar = scene.add.graphics();
+        
 
         // Crea le animazioni del giocatore
         this.createPlayerAnimations(scene.anims);
@@ -31,10 +34,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
          // Crea l'animazione per lo sparo della pistola
          scene.anims.create({
             key: 'shoot',
-            frames: scene.anims.generateFrameNumbers('shoot', { start: 0, end: 11 }),
+            frames: scene.anims.generateFrameNumbers('shoot', { start: 0, end: 6 }),
             frameRate: 10,
             repeat: 0
         });
+
+        // Imposta lo stile del giocatore
+        this.style = new Style();
 
         // Imposta la scena come proprietà del giocatore
         this.scene = scene;
@@ -63,12 +69,15 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         });
     }
 
+    //ATTACCO CON LA SPADA
     attack() {
         // Verifica se è passato almeno un secondo dall'ultimo attacco
         const currentTime = this.scene.time.now;
         if (currentTime - this.lastAttackTime < 1000) { 
             return; 
         }
+
+        this.scene.sound.play('SwordSound');
 
         // Determina la direzione del giocatore
         const isFacingLeft = this.body.velocity.x < 0;
@@ -108,38 +117,22 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         // Rileva le collisioni tra lo slash e i nemici
         this.scene.physics.overlap(slash, this.scene.enemies, (slash, enemy) => {
             enemy.destroy();
+            this.style.addKill('sword');
+            
         });
 
         // Aggiorna il tempo dell'ultimo attacco
         this.lastAttackTime = currentTime;
     }
 
+    //ATTACCO CON LASER
     shoot() {
-        // Verifica se l'animazione della pistola è già in corso
+        // Verifica se l'animazione del laser è già in corso
         if (this.isShooting) {
             return;
         }
-    
-        // Imposta lo stato di sparatoria su true
-        this.isShooting = true;
-    
-        const shoot = this.scene.physics.add.sprite(0, 0, 'shoot');
-    
-        shoot.setTexture('shoot', 0);
-        shoot.anims.play('shoot');
-        this.scene.children.add(shoot);
-    
-        const updateShootPosition = () => {
-            const offsetX = 20;
-            const offsetY = 0;
-            shoot.x = this.x + offsetX;
-            shoot.y = this.y + offsetY;
-        };
-    
-        // Aggiornamento della posizione della pistola quando il giocatore si muove
-        this.on('move', updateShootPosition);
-        updateShootPosition();
-    
+
+
         // Trova il nemico più vicino al giocatore
         let nearestEnemy = null;
         let nearestDistance = Number.MAX_VALUE;
@@ -151,23 +144,53 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             }
         });
     
-        // Se c'è un nemico e il proiettile interseca il nemico, distruggi il nemico
-        if (nearestEnemy) {
-            nearestEnemy.destroy();
-            const angle = Phaser.Math.Angle.Between(this.x, this.y, nearestEnemy.x, nearestEnemy.y);
-    
-            shoot.setRotation(angle);
+        if (!nearestEnemy) {
+            // Se non ci sono nemici, interrompi la funzione
+            return;
         }
     
-        shoot.on('animationcomplete', () => {
-            shoot.destroy();
-            this.off('move', updateShootPosition);
+        this.scene.sound.play('LaserSound');
+
+        // Crea il laser tra il giocatore e il nemico più vicino
+        const laser = this.scene.add.sprite(this.x, this.y, 'laser');
+        laser.anims.play('shoot'); // Imposta l'animazione 'shoot' per il laser
+        this.scene.physics.add.existing(laser); // Aggiunge il laser alla fisica
+    
+        // Calcola l'angolo tra il giocatore e il nemico
+        const angle = Phaser.Math.Angle.Between(this.x, this.y, nearestEnemy.x, nearestEnemy.y);
+        // Imposta la rotazione del laser
+        laser.rotation = angle;
+    
+        // Calcola la lunghezza del laser
+        const distanceX = nearestEnemy.x - this.x;
+        const distanceY = nearestEnemy.y - this.y;
+        const length = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+    
+        // Imposta la lunghezza e la posizione del laser
+        laser.setScale(length / laser.width, 1);
+        laser.setPosition(this.x + distanceX / 2, this.y + distanceY / 2);
+    
+        // Distruggi il nemico quando viene colpito dal laser
+        nearestEnemy.destroy();
+        this.style.addKill('laser');
+
+        // Imposta lo stato di sparatoria su true
+        this.isShooting = true;
+    
+        // Distruggi il laser dopo un certo periodo di tempo
+        this.scene.time.delayedCall(500, () => {
+            laser.destroy();
             // Ripristina lo stato di sparatoria su false
             this.isShooting = false;
         });
-    }
-    
+    }    
 
+    //ATTACCO SPECIALE
+    killAllEnemies() {
+        this.scene.enemies.getChildren().forEach(enemy => enemy.destroy());
+    }
+
+    
       
     updateHealthBar() {
         // Cancella la barra della vita precedente
@@ -180,8 +203,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         const barLength = (this.health / 100) * 100; 
 
         this.healthBar.fillRect(this.x - 50, this.y - 50, barLength, 10);
-    }          
-
+    } 
+    
+    getStyleGrade() {
+        return this.style.grade;
+    }
+    
     update(cursors) {
         // Movimento del giocatore
         if (cursors && cursors.left.isDown) {
@@ -194,7 +221,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.setVelocityX(0);
             this.anims.play('turn');
         }
-
+    
         if (cursors && cursors.up.isDown) {
             this.setVelocityY(-160);
         } else if (cursors && cursors.down.isDown) {
@@ -202,21 +229,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         } else {
             this.setVelocityY(0);
         }
-
-        // Attacco con la spada
-        if (Phaser.Input.Keyboard.JustDown(cursors.attack)) {
-            this.attack();
-        }
-
-        // Attacco con la pistola
-        if (Phaser.Input.Keyboard.JustDown(cursors.shoot)) {
-            this.shoot();
-        }
-
+    
         // Aggiorna la barra della vita
         this.updateHealthBar();
-
+    
         // Controlla le collisioni con i nemici e gestisce l'attacco
         this.scene.physics.overlap(this, this.scene.enemies, (player, enemy) => enemy.playerHit(player, this.scene), null, this);
-    }
-    }
+    }    
+}
